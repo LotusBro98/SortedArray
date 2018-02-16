@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 struct sorted_array
 {
 	void* buffer;
@@ -7,7 +9,7 @@ struct sorted_array
 	int (*compar)(void* a, void* b);
 
 	size_t n;
-}
+};
 
 struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(void* a, void* b))
 {
@@ -30,3 +32,10 @@ struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(
 
 	return array;
 }
+
+void sadelete(struct sorted_array* array)
+{
+	free(array->buffer);
+	free(array);
+}
+

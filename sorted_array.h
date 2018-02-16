@@ -24,6 +24,10 @@
  * - saresort() function to fix broken order in case when it can change.
  */
 
+#ifndef SORTED_ARRAY_H
+#define SORTED_ARRAY_H
+
+#include <stdlib.h>
 
 /** @struct sorted_array
  * Structure representing a static array that is always sorted.
@@ -56,3 +60,12 @@
  * @return A pointer to newly created array, or NULL in case of an error.
  */
 struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(void* a, void* b));
+
+/**
+ * Delete a sorted array.
+ *
+ * Free the space, allocated for this struct and the underlying buffer.
+ */
+void sadelete(struct sorted_array* array);
+
+#endif
