@@ -51,13 +51,16 @@
 /**
  * Create a new sorted array.
  *
- * @param max_elems max array length 
+ * This function allocates a space for the sorted_array struct and for underlying buffer in the heap.
+ *
  * @param elem_size size of one element in bytes
+ * @param max_elems max array length 
  * @param compar specifies a comparator function. 
  * It has to return negative value if the first argument is less than the second, 
  * positive value if the first argument is bigger than the second, 
  * and zero if they are equal.
  * @return A pointer to newly created array, or NULL in case of an error.
+ * @errors See man 3 malloc
  */
 struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(void* a, void* b));
 
