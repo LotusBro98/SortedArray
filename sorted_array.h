@@ -10,6 +10,7 @@
  *   + saput();
  *   + saget();
  *   + sarm();
+ *   + sarmall();
  * - functions for obtaining information about an array and its elements:
  *   + salen();
  *   + safind();
@@ -33,7 +34,7 @@
  * The array is sorted, so there must be relations of order between elements. 
  * When creating a new array, the caller of saalloc() must specify comparator function to define these relations.
  * These relations must preserve across the whole lifetime of the array.
- * 
+ *
  * @note If you want to have an array of "heavy" elements, consider working with their pointers instead 
  * (So, in fact, the array will be dynamic).
  * @note If you encounter a situation when you need to apply some changes to the elements that can affect their order 
