@@ -35,7 +35,7 @@ doxygen:
 	@printf "\033[32mGenerating documentation...\033[0m\n"
 	doxygen doc/Doxyfile
 
-### Dependencies from headers ###
+### Dependencies on headers ###
 
 libsarr.so: sorted_array.h
 Tests: sorted_array.h
