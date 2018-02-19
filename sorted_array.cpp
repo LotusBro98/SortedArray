@@ -39,3 +39,24 @@ void sadelete(struct sorted_array* array)
 	free(array);
 }
 
+/**
+ * @errors
+ * <b>EINVAL</b> -- \p array is NULL.\n
+ * <b>ERANGE</b> -- \p index is out of range.
+ */
+void* saget(struct sorted_array* array, size_t index)
+{
+	if (array == NULL)
+	{
+		errno = EINVAL;
+		return NULL;
+	}
+
+	if (index >= array->n)
+	{
+		errno = ERANGE;
+		return NULL;
+	}
+
+	return (char*)array->buffer + index * array->elem_size;
+}
