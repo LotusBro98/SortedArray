@@ -7,21 +7,21 @@
  *   + sacreate();
  *   + sadelete();
  * - functions for working with elements:
- *   + saput();
- *   + saget();
- *   + sarm();
- *   + sarmall();
+ *   + saput(); //TODO
+ *   + saget(); //TODO
+ *   + sarm(); //TODO
+ *   + sarmall(); //TODO
  * - functions for obtaining information about an array and its elements:
- *   + salen();
- *   + safind();
+ *   + salen(); //TODO
+ *   + safind(); //TODO
  * - iterator interface for this structure:
- *   + struct sorted_array_iter;
- *   + sainew();
- *   + saiend();
- *   + sainext();
- *   + saiget();
- * - different variants of foreach() function.
- * - saresort() function to fix broken order in case when it can change.
+ *   + struct sa_iter; //TODO
+ *   + sainew(); //TODO
+ *   + saiend(); //TODO
+ *   + sainext(); //TODO
+ *   + saiget(); //TODO
+ * - different variants of foreach() function. //TODO
+ * - saresort() function to fix broken order in case when it can change. //TODO
  */
 
 #ifndef SORTED_ARRAY_H
@@ -70,5 +70,21 @@ struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(
  * Free the space, allocated for this struct and the underlying buffer.
  */
 void sadelete(struct sorted_array* array);
+
+/**
+ * Get a pointer to an element of the array by its index.
+ *
+ * @return A pointer to i'th element or NULL, if index is out of range.
+ * @note This function doesn't create a new instance of an element, so if you want to change the element afterwards, you will need to copy the element manually. Also you can call saresort() after applying changes.
+ */
+void* saget(struct sorted_array* array, size_t index);
+
+/**
+ * Put an element into a sorted array.
+ *
+ * This function will insert a copy of given element into a sorted array, keeping its ascending order.
+ * @return 0, if no error, -1 otherwise
+ */
+int saput(struct sorted_array* array, void* elem);
 
 #endif
