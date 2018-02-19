@@ -11,6 +11,81 @@ struct sorted_array
 	size_t n;
 };
 
+
+
+
+// ===============================  Supplementary funcs  ==================================
+
+inline void* getElem(struct sorted_array* array, size_t index)
+{
+	return (char*)array->buffer + index * array->elem_size;
+}
+
+inline int cmp(struct sorted_array* array, size_t a_index, size_t b_index)
+{
+	return array->compar(getElem(array, a_index), getElem(array, b_index));
+}
+
+inline int cmp(struct sorted_array* array, size_t index, void* elem)
+{
+	return array->compar(getElem(array, index), elem);
+}
+
+void insert8(struct sorted_array* array, size_t index, void* elem)
+{
+	for (size_t i = array->n; i > index; i--)
+		*(int8_t*)getElem(array, i) = *(int8_t*)getElem(array, i - 1);
+	*(int8_t*)getElem(array, index) = *(int8_t*)elem;
+	array->n++;
+}
+
+void insert(struct sorted_array* array, size_t index, void* elem)
+{
+	switch (array->elem_size)
+	{
+		case 1:
+			insert8(array, index, elem);
+			break;
+		default:
+			for (size_t i = array->n; i > index; i--)
+				memcpy(getElem(array, i), getElem(array, i - 1), array->elem_size);
+			memcpy(getElem(array, index), elem, array->elem_size);
+			break;
+	}
+}
+
+size_t findPlace(struct sorted_array* array, void* elem)
+{
+	if (array->n == 0)
+		return 0;
+	if (cmp(array, 0, elem) >= 0)
+		return 0;
+	if (cmp(array, array->n - 1, elem) <= 0)
+		return array->n;
+
+
+	size_t left = 0;
+	size_t right = array->n - 1;
+	size_t center;
+	while (left + 1 < right)
+	{
+		center = (left + right) / 2;
+		int sign = cmp(array, center, elem);
+		if (sign == 0)
+			return center;
+		if (sign < 0)
+			left = center;
+		else
+			right = center;
+	}
+	return right;
+}
+
+
+
+
+// =================================  API funcs  =======================================
+
 struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(void* a, void* b))
 {
 	struct sorted_array* array = (struct sorted_array*) malloc(sizeof(struct sorted_array));
@@ -59,4 +134,29 @@ void* saget(struct sorted_array* array, size_t index)
 	}
 
 	return (char*)array->buffer + index * array->elem_size;
+}
+
+/**
+ * @errors
+ * <b>EINVAL</b> -- \p array is NULL.\n
+ * <b>ENOMEM</b> -- Maximum number of stored elements is reached.
+ */
+int saput(struct sorted_array* array, void* elem)
+{
+	if (array == NULL || elem == NULL)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+	
+	if (array->n >= array->max_elems)
+	{
+		errno = ENOMEM;
+		return -1;
+	}
+
+	size_t place = findPlace(array, elem);
+	insert(array, place, elem);
+
+	return 0;
 }
