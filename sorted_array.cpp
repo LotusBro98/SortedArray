@@ -47,6 +47,13 @@ void insert8(struct sorted_array* array, size_t index, void* elem)
 	array->n++;
 }
 
+void remove8(struct sorted_array* array, size_t index)
+{
+	for (size_t i = index; i < (array->n - 1); i++)
+		*(int8_t*)getElem(array, i) = *(int8_t*)getElem(array, i + 1);
+	array->n--;
+}
+
 void insert(struct sorted_array* array, size_t index, void* elem)
 {
 	switch (array->elem_size)
@@ -62,6 +69,22 @@ void insert(struct sorted_array* array, size_t index, void* elem)
 	}
 }
 
+void remove(struct sorted_array* array, size_t index)
+{
+	switch (array->elem_size)
+	{
+		case 1:
+			remove8(array, index);
+			break;
+		default:
+			for (size_t i = index; i < (array->n - 1); i++)
+				memcpy(getElem(array, i), getElem(array, i + 1), array->elem_size);
+			array->n--;
+			break;
+	}
+}
+
+/// Find the first element that is greater than given or any element that is equal to given in a sorted array.
 size_t findPlace(struct sorted_array* array, void* elem)
 {
 	if (array->n == 0)
@@ -89,16 +112,77 @@ size_t findPlace(struct sorted_array* array, void* elem)
 	return right;
 }
 
+/// Find the first element >= @p elem
+size_t findPlaceLeft(struct sorted_array* array, void* elem)
+{
+	if (array->n == 0)
+		return 0;
+	if (cmp(array, 0, elem) >= 0)
+		return 0;
+	if (cmp(array, array->n - 1, elem) < 0)
+		return array->n;
+
+
+	size_t left = 0;
+	size_t right = array->n - 1;
+	size_t center;
+	while (left + 1 < right)
+	{
+		center = (left + right) / 2;
+		int sign = cmp(array, center, elem);
+		if (sign < 0)
+			left = center;
+		else
+			right = center;
+	}
+	return right;
+}
+
+///Find the first element > @p elem
+size_t findPlaceRight(struct sorted_array* array, void* elem)
+{
+	if (array->n == 0)
+		return 0;
+	if (cmp(array, 0, elem) > 0)
+		return 0;
+	if (cmp(array, array->n - 1, elem) < 0)
+		return array->n;
+
+
+	size_t left = 0;
+	size_t right = array->n - 1;
+	size_t center;
+	while (left + 1 < right)
+	{
+		center = (left + right) / 2;
+		int sign = cmp(array, center, elem);
+		if (sign <= 0)
+			left = center;
+		else
+			right = center;
+	}
+	return right;
+}
+
+
+
 
 
 
 // =================================  API funcs  =======================================
 /**
  * @errors
- * @b ENOMEM -- Failed to allocate memory.
+ * @b ENOMEM -- Failed to allocate memory;\n
+ * @b ERANGE -- @p elem_size of @p max_elems is not positive.
  */
-struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(void* a, void* b))
+struct sorted_array* sacreate(ssize_t elem_size, ssize_t max_elems, int (*compar)(void* a, void* b))
 {
+	if (elem_size <= 0 || max_elems <= 0)
+	{
+		errno = ERANGE;
+		return NULL;
+	}
+
 	struct sorted_array* array = (struct sorted_array*) malloc(sizeof(struct sorted_array));
 	if (array == NULL)
 		return NULL;
@@ -137,7 +221,7 @@ void sadelete(struct sorted_array* array)
 
 /**
  * @errors
- * @b EINVAL -- @p array is NULL.\n
+ * @b EINVAL -- @p array is NULL;\n
  * @b ERANGE -- @p index is out of range.
  */
 void* saget(struct sorted_array* array, size_t index)
@@ -159,7 +243,7 @@ void* saget(struct sorted_array* array, size_t index)
 
 /**
  * @errors
- * @b EINVAL -- @p array is NULL.\n
+ * @b EINVAL -- @p array is NULL;\n
  * @b ENOMEM -- Maximum number of stored elements is reached.
  */
 int saput(struct sorted_array* array, void* elem)
@@ -182,11 +266,57 @@ int saput(struct sorted_array* array, void* elem)
 	return 0;
 }
 
+/**
+ * @errors
+ * @b EINVAL -- @p array is NULL;\n
+ * @b ERANGE -- @p index is out of range.
+ */
+int sarm(struct sorted_array* array, size_t index)
+{
+	if (array == NULL)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (index >= array->n)
+	{
+		errno = ERANGE;
+		return -1;
+	}
+
+	remove(array, index);
+	return 0;
+}
+
+/**
+ * @errors
+ * @b EINVAL -- @p array or @p elem is NULL
+ */
+int sarmall(struct sorted_array* array, void* elem)
+{
+	if (array == NULL || elem == NULL)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+
+	size_t left = findPlaceLeft(array, elem);
+	size_t right = findPlaceRight(array, elem);
+
+	// TODO do it at once:
+	for (; right > left; right--)
+		sarm(array, left);
+
+	return 0;
+}
+
+
 // ----------- Iterator --------------
 
 /**
  * @errors
- * @b EINVAL -- @p array is NULL.\n
+ * @b EINVAL -- @p array is NULL;\n
  * @b ENOMEM -- Failed to allocate memory.
  */
 struct sa_iter* sainew(struct sorted_array* array)

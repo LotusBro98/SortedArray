@@ -9,8 +9,8 @@
  * - functions for working with elements:
  *   + saput();
  *   + saget();
- *   + sarm(); //TODO
- *   + sarmall(); //TODO
+ *   + sarm();
+ *   + sarmall();
  * - functions for obtaining information about an array and its elements:
  *   + salen(); //TODO
  *   + safind(); //TODO
@@ -61,7 +61,7 @@
  * and zero if they are equal.
  * @return A pointer to newly created array, or NULL in case of an error.
  */
-struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(void* a, void* b));
+struct sorted_array* sacreate(ssize_t elem_size, ssize_t max_elems, int (*compar)(void* a, void* b));
 
 /**
  * Delete a sorted array.
@@ -85,6 +85,25 @@ void* saget(struct sorted_array* array, size_t index);
  * @return 0, if no error, -1 otherwise
  */
 int saput(struct sorted_array* array, void* elem);
+
+/**
+ * Remove an element specified by its index from sorted array.
+ *
+ * @return 0 on success, -1 in case of an error.
+ */
+int sarm(struct sorted_array* array, size_t index);
+
+/**
+ * Remove all elements that are equal to given from a sorted array.
+ *
+ * @return 0 on success, -1 in case of an error.
+ */
+int sarmall(struct sorted_array* array, void* elem);
+
+size_t salen(struct sorted_array* array);
+
+
+
 
 // ----------------------------------  ITERATOR -------------------------------
 
