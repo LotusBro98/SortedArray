@@ -7,19 +7,19 @@
  *   + sacreate();
  *   + sadelete();
  * - functions for working with elements:
- *   + saput(); //TODO
- *   + saget(); //TODO
+ *   + saput();
+ *   + saget();
  *   + sarm(); //TODO
  *   + sarmall(); //TODO
  * - functions for obtaining information about an array and its elements:
  *   + salen(); //TODO
  *   + safind(); //TODO
  * - iterator interface for this structure:
- *   + struct sa_iter; //TODO
- *   + sainew(); //TODO
- *   + saiend(); //TODO
- *   + sainext(); //TODO
- *   + saiget(); //TODO
+ *   + struct sa_iter;
+ *   + sainew();
+ *   + saiend();
+ *   + sainext();
+ *   + saiget();
  * - different variants of foreach() function. //TODO
  * - saresort() function to fix broken order in case when it can change. //TODO
  */
@@ -60,7 +60,6 @@
  * positive value if the first argument is bigger than the second, 
  * and zero if they are equal.
  * @return A pointer to newly created array, or NULL in case of an error.
- * @errors See man 3 malloc
  */
 struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(void* a, void* b));
 
@@ -87,4 +86,59 @@ void* saget(struct sorted_array* array, size_t index);
  */
 int saput(struct sorted_array* array, void* elem);
 
+// ----------------------------------  ITERATOR -------------------------------
+
+/** @struct sa_iter
+ * Sorted array iterator.
+ *
+ * Presents a convenient way to perform an action to every element in an array.
+ *
+ * @b Example
+ * ~~~~~~~~~~~~~~~~~{.c}
+ * for (struct sa_iter* it = sainew(array); !saiend(it); sainext(it))
+ *     *(int*)saiget(it) = 0;
+ * ~~~~~~~~~~~~~~~~~
+ *
+ * When sainew() is called, a new instance of iterator is created. 
+ * After all the iterations, when saiend() returns true,
+ * the memory allocated for the iterator struct is automatically freed,
+ * because that instance becomes no longer needed.
+ * So, the mentioned application of this feature won't produce memory leaks.
+ * @note Because of that automatic free(), calling any "sai" functions after saiend() returned true will produce an error. 
+ * If you use iterator in such "for" loops only, it will work properly.
+ */
+struct sa_iter;
+
+/**
+ * Create a new sorted array iterator.
+ *
+ * Allocates memory for a new iterator of sorted array @p array, that will be automatically freed when saiend() returns true;
+ * @return Pointer to the newly created iterator.
+ * @see sa_iter
+ */
+struct sa_iter* sainew(struct sorted_array* array);
+
+/**
+ * Check, whether the iteraor has reached the end of an array.
+ *
+ * @return 
+ * 0, if the end is not reached; \n
+ * 1, if all the elements have been iterated; \n
+ * -1 in case of an error.
+ */
+int saiend(struct sa_iter* it);
+
+/**
+ * Shifts the iterator to the next element.
+ * 
+ * @return 0 if no error; -1 in case of an error.
+ */
+int sainext(struct sa_iter* it);
+
+/**
+ * Get a pointer to the current element under the iterator.
+ *
+ * @returns Pointer to the current element, or NULL, in case of an error.
+ */
+void* saiget(struct sa_iter* it);
 #endif

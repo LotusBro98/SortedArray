@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 
 struct sorted_array
 {
@@ -9,6 +11,12 @@ struct sorted_array
 	int (*compar)(void* a, void* b);
 
 	size_t n;
+};
+
+struct sa_iter
+{
+	struct sorted_array* array;
+	size_t i;
 };
 
 
@@ -85,7 +93,10 @@ size_t findPlace(struct sorted_array* array, void* elem)
 
 
 // =================================  API funcs  =======================================
-
+/**
+ * @errors
+ * @b ENOMEM -- Failed to allocate memory.
+ */
 struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(void* a, void* b))
 {
 	struct sorted_array* array = (struct sorted_array*) malloc(sizeof(struct sorted_array));
@@ -108,16 +119,26 @@ struct sorted_array* sacreate(size_t elem_size, size_t max_elems, int (*compar)(
 	return array;
 }
 
+/**
+ * @errors
+ * @b EINVAL -- @p array is NULL.
+ */
 void sadelete(struct sorted_array* array)
 {
+	if (array == NULL)
+	{
+		errno = EINVAL;
+		return;
+	}
+
 	free(array->buffer);
 	free(array);
 }
 
 /**
  * @errors
- * <b>EINVAL</b> -- \p array is NULL.\n
- * <b>ERANGE</b> -- \p index is out of range.
+ * @b EINVAL -- @p array is NULL.\n
+ * @b ERANGE -- @p index is out of range.
  */
 void* saget(struct sorted_array* array, size_t index)
 {
@@ -138,8 +159,8 @@ void* saget(struct sorted_array* array, size_t index)
 
 /**
  * @errors
- * <b>EINVAL</b> -- \p array is NULL.\n
- * <b>ENOMEM</b> -- Maximum number of stored elements is reached.
+ * @b EINVAL -- @p array is NULL.\n
+ * @b ENOMEM -- Maximum number of stored elements is reached.
  */
 int saput(struct sorted_array* array, void* elem)
 {
@@ -159,4 +180,81 @@ int saput(struct sorted_array* array, void* elem)
 	insert(array, place, elem);
 
 	return 0;
+}
+
+// ----------- Iterator --------------
+
+/**
+ * @errors
+ * @b EINVAL -- @p array is NULL.\n
+ * @b ENOMEM -- Failed to allocate memory.
+ */
+struct sa_iter* sainew(struct sorted_array* array)
+{
+	if (array == NULL)
+	{
+		errno = EINVAL;
+		return NULL;
+	}
+
+	struct sa_iter* it = (struct sa_iter*) malloc(sizeof(struct sa_iter));
+	if (it == NULL)
+		return NULL;
+
+	it -> array = array;
+	it -> i = 0;
+
+	return it;
+}
+
+/**
+ * @errors
+ * @b EINVAL -- @p it is NULL. 
+ */
+int saiend(struct sa_iter* it)
+{
+	if (it == NULL)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+
+	if ((it -> i) < (it -> array -> n))
+		return 0;
+	else
+	{
+		free(it);
+		return 1;
+	}
+}
+
+/**
+ * @errors
+ * @b EINVAL -- @p it is NULL
+ */
+int sainext(struct sa_iter* it)
+{
+	if (it == NULL)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+
+	it -> i++;
+	return 0;
+}
+
+/**
+ * @errors
+ * @b EINVAL -- @p it is NULL
+ */
+void* saiget(struct sa_iter* it)
+{
+	if (it == NULL)
+	{
+		errno = EINVAL;
+		return NULL;
+	}
+
+	return getElem(it -> array, it -> i);
 }

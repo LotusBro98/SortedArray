@@ -33,7 +33,7 @@ clean:
 
 doxygen:
 	@printf "\033[32mGenerating documentation...\033[0m\n"
-	doxygen doc/Doxyfile
+	doxygen doc/Doxyfile > /dev/null
 
 ### Dependencies on headers ###
 
