@@ -12,8 +12,8 @@
  *   + sarm();
  *   + sarmall();
  * - functions for obtaining information about an array and its elements:
- *   + salen(); //TODO
- *   + safind(); //TODO
+ *   + salen();
+ *   + safind();
  * - iterator interface for this structure:
  *   + struct sa_iter;
  *   + sainew();
@@ -100,7 +100,21 @@ int sarm(struct sorted_array* array, size_t index);
  */
 int sarmall(struct sorted_array* array, void* elem);
 
+/**
+ * Get sorted array length.
+ *
+ * @return A number of elements, currently stored in @p array, or (size_t)-1 in case of an error.
+ */
 size_t salen(struct sorted_array* array);
+
+/**
+ * Find an element in a sorted array.
+ *
+ * Get an index of first occurence of @p elem in a sorted array, performing binary search.
+ *
+ * @return Index of given element, or (size_t)-1 in case of an error.
+ */
+size_t safind(struct sorted_array* array, void* elem);
 
 
 

@@ -311,6 +311,60 @@ int sarmall(struct sorted_array* array, void* elem)
 	return 0;
 }
 
+/**
+ * @errors
+ * @b EINVAL -- @p array is NULL.
+ */
+size_t salen(struct sorted_array* array)
+{
+	if (array == NULL)
+	{
+		errno = EINVAL;
+		return (size_t) -1;
+	}
+
+	return array -> n;
+}
+
+/**
+ * @errors
+ * @b EINVAL -- @p array or @p elem is NULL;\n
+ * @b ENOENT -- there is no such element in the array.
+ */
+size_t safind(struct sorted_array* array, void* elem)
+{
+	if (array == NULL || elem == NULL)
+	{
+		errno = EINVAL;
+		return (size_t)-1;
+	}
+
+	if (array->n == 0)
+	{
+		errno = ENOENT;
+		return (size_t)-1;
+	}
+
+	size_t place = findPlaceLeft(array, elem);
+	if (place == array->n)
+	{
+		errno = ENOENT;
+		return (size_t)-1;
+	}
+
+	if (cmp(array, place, elem) == 0)
+		return place;
+	else
+	{
+		errno = ENOENT;
+		return (size_t)-1;
+	}
+}
+
+
+
+
+
 
 // ----------- Iterator --------------
 

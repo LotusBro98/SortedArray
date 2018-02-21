@@ -42,5 +42,12 @@ int main()
 		printf("%hhu ", *(char*)saiget(it));
 	printf("\n");
 
+	victim = 3;
+	printf("%lu\n", safind(arr, &victim));
+	victim = 9;
+	printf("%lu\n", safind(arr, &victim));
+	victim = 11;
+	printf("%lu\n", safind(arr, &victim));
+
 	return 0;
 }
