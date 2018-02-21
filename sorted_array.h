@@ -20,8 +20,8 @@
  *   + saiend();
  *   + sainext();
  *   + saiget();
- * - different variants of foreach() function. //TODO
- * - saresort() function to fix broken order in case when it can change. //TODO
+ * - different variants of foreach() function.
+ * - saresort() function to fix broken order in case when it can change.
  */
 
 #ifndef SORTED_ARRAY_H
@@ -61,7 +61,7 @@
  * and zero if they are equal.
  * @return A pointer to newly created array, or NULL in case of an error.
  */
-struct sorted_array* sacreate(ssize_t elem_size, ssize_t max_elems, int (*compar)(void* a, void* b));
+struct sorted_array* sacreate(ssize_t elem_size, ssize_t max_elems, int (*compar)(const void* a, const void* b));
 
 /**
  * Delete a sorted array.
@@ -116,8 +116,25 @@ size_t salen(struct sorted_array* array);
  */
 size_t safind(struct sorted_array* array, void* elem);
 
+/**
+ * Sort array again in case when relations of order between stored elements change.
+ * 
+ * Invoke qsort() on an array to restore broken order.
+ * @return 0 on success, -1 on error
+ */
+int saresort(struct sorted_array* array);
 
+/**
+ * Call @p func on every element of an array.
+ */
+int saforeach(struct sorted_array* array, void (*func)(void* elem));
 
+/**
+ * Call @p func on every element of an array.
+ *
+ * The extended version. You can also pass an argument @p context to every call of @p func.
+ */
+int saforeach(struct sorted_array* array, void* context, void (*func)(struct sorted_array* array, void* elem, void* context));
 
 // ----------------------------------  ITERATOR -------------------------------
 

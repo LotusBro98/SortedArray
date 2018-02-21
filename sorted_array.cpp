@@ -8,7 +8,7 @@ struct sorted_array
 	size_t elem_size;
 	size_t max_elems;
 
-	int (*compar)(void* a, void* b);
+	int (*compar)(const void* a, const void* b);
 
 	size_t n;
 };
@@ -47,12 +47,20 @@ void insert8(struct sorted_array* array, size_t index, void* elem)
 	array->n++;
 }
 
+// TODO insert16
+// TODO insert32
+// TODO insert64
+
 void remove8(struct sorted_array* array, size_t index)
 {
 	for (size_t i = index; i < (array->n - 1); i++)
 		*(int8_t*)getElem(array, i) = *(int8_t*)getElem(array, i + 1);
 	array->n--;
 }
+
+// TODO remove16
+// TODO remove32
+// TODO remove64
 
 void insert(struct sorted_array* array, size_t index, void* elem)
 {
@@ -175,7 +183,7 @@ size_t findPlaceRight(struct sorted_array* array, void* elem)
  * @b ENOMEM -- Failed to allocate memory;\n
  * @b ERANGE -- @p elem_size of @p max_elems is not positive.
  */
-struct sorted_array* sacreate(ssize_t elem_size, ssize_t max_elems, int (*compar)(void* a, void* b))
+struct sorted_array* sacreate(ssize_t elem_size, ssize_t max_elems, int (*compar)(const void* a, const void* b))
 {
 	if (elem_size <= 0 || max_elems <= 0)
 	{
@@ -361,7 +369,51 @@ size_t safind(struct sorted_array* array, void* elem)
 	}
 }
 
+/**
+ * @errors 
+ * @b EINVAL -- @p array is NULL.
+ */
+int saresort(struct sorted_array* array)
+{
+	if (array == NULL)
+	{
+		errno = EINVAL;
+		return -1;
+	}
 
+	qsort(array->buffer, array->n, array->elem_size, array->compar);
+	return 0;
+}
+
+/// @errors @b EINVAL -- @p array or @p func is NULL;
+int saforeach(struct sorted_array* array, void (*func)(void* elem))
+{
+	if (array == NULL || func == NULL)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+
+	for (size_t i = 0; i < array->n; i++)
+		func(getElem(array, i));
+
+	return 0;
+}
+
+/// @errors @b EINVAL -- @p array, @p func or @p context is NULL;
+int saforeach(struct sorted_array* array, void* context, void (*func)(struct sorted_array* array, void* elem, void* context))
+{
+	if (array == NULL || func == NULL || context == NULL)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+
+	for (size_t i = 0; i < array->n; i++)
+		func(array, getElem(array, i), context);
+
+	return 0;
+}
 
 
 
