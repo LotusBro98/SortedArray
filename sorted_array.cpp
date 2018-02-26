@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <stdio.h>
 
 struct sorted_array
 {
@@ -39,57 +40,28 @@ inline int cmp(struct sorted_array* array, size_t index, void* elem)
 	return array->compar(getElem(array, index), elem);
 }
 
-void insert8(struct sorted_array* array, size_t index, void* elem)
+void shiftRight(struct sorted_array* array, size_t index, size_t shift)
 {
-	for (size_t i = array->n; i > index; i--)
-		*(int8_t*)getElem(array, i) = *(int8_t*)getElem(array, i - 1);
-	*(int8_t*)getElem(array, index) = *(int8_t*)elem;
-	array->n++;
+	char* p = (char*)array->buffer + array->n * array->elem_size + shift - 8;
+	char* last = (char*)array->buffer + index * array->elem_size + shift;
+
+	for (; p >= last; p -= 8)
+		*(int64_t*)(p) = *(int64_t*)(p - shift);
+
+	for (p += 8 - 1; p >= last; p--)
+		*(p) = *(p - shift);
 }
 
-// TODO insert16
-// TODO insert32
-// TODO insert64
-
-void remove8(struct sorted_array* array, size_t index)
+void shifLeft(struct sorted_array* array, size_t index, size_t shift)
 {
-	for (size_t i = index; i < (array->n - 1); i++)
-		*(int8_t*)getElem(array, i) = *(int8_t*)getElem(array, i + 1);
-	array->n--;
-}
+	char* p = (char*) array->buffer + index * array->elem_size;
+	char* last = (char*) array->buffer + array->n * array->elem_size - shift - 8;
 
-// TODO remove16
-// TODO remove32
-// TODO remove64
-
-void insert(struct sorted_array* array, size_t index, void* elem)
-{
-	switch (array->elem_size)
-	{
-		case 1:
-			insert8(array, index, elem);
-			break;
-		default:
-			for (size_t i = array->n; i > index; i--)
-				memcpy(getElem(array, i), getElem(array, i - 1), array->elem_size);
-			memcpy(getElem(array, index), elem, array->elem_size);
-			break;
-	}
-}
-
-void remove(struct sorted_array* array, size_t index)
-{
-	switch (array->elem_size)
-	{
-		case 1:
-			remove8(array, index);
-			break;
-		default:
-			for (size_t i = index; i < (array->n - 1); i++)
-				memcpy(getElem(array, i), getElem(array, i + 1), array->elem_size);
-			array->n--;
-			break;
-	}
+	for (; p <= last; p += 8)
+		*(int64_t*)(p) = *(int64_t*)(p + shift);
+	
+	for (last += 8 - 1; p <= last; p++)
+		*(p) = *(p + shift);
 }
 
 /// Find the first element that is greater than given or any element that is equal to given in a sorted array.
@@ -269,7 +241,9 @@ int saput(struct sorted_array* array, void* elem)
 	}
 
 	size_t place = findPlace(array, elem);
-	insert(array, place, elem);
+	shiftRight(array, place, array->elem_size);
+	memcpy(getElem(array, place), elem, array->elem_size);
+	array->n++;
 
 	return 0;
 }
@@ -293,7 +267,8 @@ int sarm(struct sorted_array* array, size_t index)
 		return -1;
 	}
 
-	remove(array, index);
+	shifLeft(array, index, array->elem_size);
+	array->n--;
 	return 0;
 }
 
@@ -312,9 +287,8 @@ int sarmall(struct sorted_array* array, void* elem)
 	size_t left = findPlaceLeft(array, elem);
 	size_t right = findPlaceRight(array, elem);
 
-	// TODO do it at once:
-	for (; right > left; right--)
-		sarm(array, left);
+	shifLeft(array, left, (right - left) * array->elem_size);
+	array->n -= right - left;
 
 	return 0;
 }

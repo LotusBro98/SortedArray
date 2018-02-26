@@ -29,7 +29,7 @@ Tests: Tests.o
 
 clean:
 	@printf "\033[32mRemoving all build files...\033[0m\n"
-	rm *.o *.so Tests
+	rm -rf *.o *.so Tests doc/*/
 
 doxygen:
 	@printf "\033[32mGenerating documentation...\033[0m\n"
