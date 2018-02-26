@@ -38,4 +38,4 @@ doxygen:
 ### Dependencies on headers ###
 
 libsarr.so: sorted_array.h
-Tests: sorted_array.h
+Tests: SortedArray.hpp sorted_array.h

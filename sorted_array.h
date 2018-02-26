@@ -17,6 +17,7 @@
  * - iterator interface for this structure:
  *   + struct sa_iter;
  *   + sainew();
+ *   + saidelete();
  *   + saiend();
  *   + sainext();
  *   + saiget();
@@ -145,17 +146,11 @@ int saforeach(struct sorted_array* array, void* context, void (*func)(struct sor
  *
  * @b Example
  * ~~~~~~~~~~~~~~~~~{.c}
- * for (struct sa_iter* it = sainew(array); !saiend(it); sainext(it))
+ * struct sa_iter* it;
+ * for (it = sainew(array); !saiend(it); sainext(it))
  *     *(int*)saiget(it) = 0;
+ * saidelete(it);
  * ~~~~~~~~~~~~~~~~~
- *
- * When sainew() is called, a new instance of iterator is created. 
- * After all the iterations, when saiend() returns true,
- * the memory allocated for the iterator struct is automatically freed,
- * because that instance becomes no longer needed.
- * So, the mentioned application of this feature won't produce memory leaks.
- * @note Because of that automatic free(), calling any "sai" functions after saiend() returned true will produce an error. 
- * If you use iterator in such "for" loops only, it will work properly.
  */
 struct sa_iter;
 
@@ -167,6 +162,11 @@ struct sa_iter;
  * @see sa_iter
  */
 struct sa_iter* sainew(struct sorted_array* array);
+
+/**
+ * Delete sorted array iterator.
+ */
+void saidelete(struct sa_iter* it);
 
 /**
  * Check, whether the iteraor has reached the end of an array.

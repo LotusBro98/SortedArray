@@ -419,6 +419,21 @@ struct sa_iter* sainew(struct sorted_array* array)
 
 /**
  * @errors
+ * @b EINVAL -- @p it is NULL.
+ */
+void saidelete(struct sa_iter* it)
+{
+	if (it == NULL)
+	{
+		errno = EINVAL;
+		return;
+	}
+
+	free(it);
+}
+
+/**
+ * @errors
  * @b EINVAL -- @p it is NULL. 
  */
 int saiend(struct sa_iter* it)
@@ -432,10 +447,7 @@ int saiend(struct sa_iter* it)
 	if ((it -> i) < (it -> array -> n))
 		return 0;
 	else
-	{
-		free(it);
 		return 1;
-	}
 }
 
 /**
