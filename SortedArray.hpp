@@ -71,43 +71,50 @@ public:
 	{
 		saforeach(array, context, func);
 	}
+
+	/**
+	* Sorted Array Iterator
+	 * @see sa_iter;
+	 */
+	class Iterator
+	{
+	public:
+		Iterator(SortedArray &sa)
+		{
+			it = sainew(sa.array);
+		}
+
+		~Iterator()
+		{
+			saidelete(it);
+		}
+
+		T* get()
+		{
+			return (T*)saiget(it);
+		}
+
+		void next()
+		{
+			sainext(it);
+		}
+
+		bool isEnd()
+		{
+			return saiend(it);
+		}
+
+	private:
+		struct sa_iter* it;
+	}
+
+	std::ostream& operator<<(std::ostream &os)
+	{
+		for ()
+	}
 	
 private:
 	struct sorted_array* array;
 }
 
-/**
- * Sorted Array iterator
- * @see sa_iter;
- */
-template <class T> class SAIterator
-{
-public:
-	SAIterator(struct sorted_array* array)
-	{
-		iter = sainew(array);	
-	}
 
-	~SAIterator()
-	{
-		saidelete(iter);
-	}
-
-	T* get()
-	{
-		return (T*)saiget(iter);
-	}
-
-	void next()
-	{
-		sainext(iter);
-	}
-
-	bool isEnd()
-	{
-		return saiend(iter);
-	}
-
-private:
-	struct sa_iter* iter;
-}
