@@ -6,6 +6,8 @@
 
 #include "sorted_array.h"
 
+#include <iostream>
+
 /**
  * Sorted array wrapper class
  * @see sorted_array
@@ -13,17 +15,15 @@
 template <class T> class SortedArray
 {
 public:
-	SortedArray(size_t maxElems, int (*compar)(void* a, void* b)) throw (int)
+	inline SortedArray(size_t maxElems, int (*compar)(const void* a, const void* b))
 	{
-		array = saalloc(sizeof(T), maxElems, compar);
-		if (errno != 0)
-			throw errno;
+		array = sanew(sizeof(T), maxElems, compar);
 	}
 
 	~SortedArray()
 	{
-		for (struct sa_iter* it = sainew(array); !saiend(it); sainext(it))
-			((T*)saiget(it))->~T();
+		for (Iterator it(*this); !it.isEnd(); it.next())
+			it.get().~T();
 		sadelete(array);
 	}
 
@@ -32,9 +32,9 @@ public:
 		saput(array, &elem);
 	}
 
-	T* get(size_t index) 
+	T& get(size_t index) 
 	{
-		saget(array, index);
+		return *(T*)saget(array, index);
 	}
 
 	void remove(size_t index) 
@@ -89,9 +89,9 @@ public:
 			saidelete(it);
 		}
 
-		T* get()
+		T& get()
 		{
-			return (T*)saiget(it);
+			return *(T*)saiget(it);
 		}
 
 		void next()
@@ -106,15 +106,21 @@ public:
 
 	private:
 		struct sa_iter* it;
+	};
+	
+	friend std::ostream& operator<<(std::ostream &os, SortedArray &sa)
+	{
+		for (Iterator it(sa); !it.isEnd(); it.next())
+			os << it.get() << ' ';
+		os << '\n';
+		return os;
 	}
 
-	std::ostream& operator<<(std::ostream &os)
+	const T& operator[](size_t index)
 	{
-		for ()
+		return get(index);
 	}
-	
+
 private:
 	struct sorted_array* array;
-}
-
-
+};

@@ -155,7 +155,7 @@ size_t findPlaceRight(struct sorted_array* array, void* elem)
  * @b ENOMEM -- Failed to allocate memory;\n
  * @b ERANGE -- @p elem_size of @p max_elems is not positive.
  */
-struct sorted_array* sacreate(ssize_t elem_size, ssize_t max_elems, int (*compar)(const void* a, const void* b))
+struct sorted_array* sanew(ssize_t elem_size, ssize_t max_elems, int (*compar)(const void* a, const void* b))
 {
 	if (elem_size <= 0 || max_elems <= 0)
 	{

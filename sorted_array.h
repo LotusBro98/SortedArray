@@ -4,7 +4,7 @@
  * Here you can find declarations and descriptions of:
  * - struct sotred_array;
  * - functions for creating and destroying a sorted array:
- *   + sacreate();
+ *   + sanew();
  *   + sadelete();
  * - functions for working with elements:
  *   + saput();
@@ -62,7 +62,7 @@
  * and zero if they are equal.
  * @return A pointer to newly created array, or NULL in case of an error.
  */
-struct sorted_array* sacreate(ssize_t elem_size, ssize_t max_elems, int (*compar)(const void* a, const void* b));
+struct sorted_array* sanew(ssize_t elem_size, ssize_t max_elems, int (*compar)(const void* a, const void* b));
 
 /**
  * Delete a sorted array.
