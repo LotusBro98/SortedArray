@@ -116,9 +116,22 @@ public:
 		return os;
 	}
 
-	const T& operator[](size_t index)
+	inline const T& operator[](size_t index)
 	{
 		return get(index);
+	}
+
+	template <size_t N>
+	bool operator==(T (&array)[N])
+	{
+		if (len() != N)
+			return false;
+
+		for (size_t i = 0; i < N; i++)
+			if (get(i) != array[i])
+				return false;
+
+		return true;
 	}
 
 private:
