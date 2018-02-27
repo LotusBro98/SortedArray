@@ -12,7 +12,7 @@
  * Sorted array wrapper class
  * @see sorted_array
  */
-template <class T> class SortedArray
+template <typename T> class SortedArray
 {
 public:
 	inline SortedArray(size_t maxElems, int (*compar)(const void* a, const void* b))
@@ -27,50 +27,19 @@ public:
 		sadelete(array);
 	}
 
-	void put(T &elem) 
-	{
-		saput(array, &elem);
-	}
-
-	T& get(size_t index) 
-	{
-		return *(T*)saget(array, index);
-	}
-
-	void remove(size_t index) 
-	{
-		sarm(array, index);
-	}
-
-	void removeAll(T &elem)
-	{
-		sarmall(array, &elem);
-	}
-
-	size_t len()
-	{
-		return salen(array);
-	}
-
-	size_t find(T &elem)
-	{
-		return safind(array, &elem);
-	}
-
-	void resort()
-	{
-		saresort(array);
-	}
+	inline void put(T elem)			{ saput(array, &elem); }
+	inline T get(size_t index)		{ return *(T*)saget(array, index); }
+	inline void remove(size_t index){ sarm(array, index); }
+	inline void removeAll(T elem)	{ sarmall(array, &elem); }
+	inline size_t len()				{ return salen(array); }
+	inline size_t find(T elem)		{ return safind(array, &elem); }
+	inline void resort()			{ saresort(array); }
 
 	void foreach(void (*func)(void* elem))
-	{
-		saforeach(array, func);
-	}
+	{ saforeach(array, func); }
 
 	void foreach(void* context, void (*func)(struct sorted_array* array, void* elem, void* context))
-	{
-		saforeach(array, context, func);
-	}
+	{ saforeach(array, context, func); }
 
 	/**
 	* Sorted Array Iterator
@@ -80,29 +49,14 @@ public:
 	{
 	public:
 		Iterator(SortedArray &sa)
-		{
-			it = sainew(sa.array);
-		}
+		{ it = sainew(sa.array); }
 
 		~Iterator()
-		{
-			saidelete(it);
-		}
+		{ saidelete(it); }
 
-		T& get()
-		{
-			return *(T*)saiget(it);
-		}
-
-		void next()
-		{
-			sainext(it);
-		}
-
-		bool isEnd()
-		{
-			return saiend(it);
-		}
+		inline T get()		{ return *(T*)saiget(it); }
+		inline void next()	{ sainext(it); }
+		inline bool isEnd()	{ return saiend(it); }
 
 	private:
 		struct sa_iter* it;
@@ -116,7 +70,7 @@ public:
 		return os;
 	}
 
-	inline const T& operator[](size_t index)
+	inline T operator[](size_t index)
 	{
 		return get(index);
 	}
@@ -128,7 +82,7 @@ public:
 			return false;
 
 		for (size_t i = 0; i < N; i++)
-			if (get(i) != array[i])
+			if (sacmp(this->array, i, &(array[i])) != 0)
 				return false;
 
 		return true;

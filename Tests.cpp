@@ -24,16 +24,26 @@ void testMsg(int testNumber, bool success)
 
 int main()
 {
-	int A[20] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 3, 6, 2, 1, 8, 7, 9, 0, 4, 5};
-	int B[20] = {0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9};
 	
 	SortedArray<int> sa(20, cmp_int);
 	
-	// Test 1. putting and getting
-	for (int a : A)
+	// Test 1. Putting and getting
+	int IN[20] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 3, 6, 2, 1, 8, 7, 9, 0, 4, 5};
+	for (int a : IN)
+	{
 		sa.put(a);
+		std::cout << a << "-> "<< sa;
+	}
 
-	testMsg(1, sa == B);
+	int T1[20] = {0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9};
+	testMsg(1, sa == T1); //Here we also test getting.
+
+	//Test 2. Removing
+	sa.removeAll(3);
+	std::cout << sa;
+
+	int T2[18] = {0, 0, 1, 1, 2, 2, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9};
+	testMsg(2, sa == T2);
 	
 	return 0;
 }

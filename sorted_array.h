@@ -14,6 +14,7 @@
  * - functions for obtaining information about an array and its elements:
  *   + salen();
  *   + safind();
+ *   + sacmp();
  * - iterator interface for this structure:
  *   + struct sa_iter;
  *   + sainew();
@@ -116,6 +117,14 @@ size_t salen(struct sorted_array* array);
  * @return Index of given element, or (size_t)-1 in case of an error.
  */
 size_t safind(struct sorted_array* array, void* elem);
+
+/**
+ * Compare an element of a sorted array, specified by @p index, with @p elem.
+ *
+ * @return An integer less than, equal to, or greater than zero, 
+ * if i-th element is less than, equal to, or greater than @p elem.
+ */
+int sacmp(struct sorted_array* array, size_t index, void* elem);
 
 /**
  * Sort array again in case when relations of order between stored elements change.

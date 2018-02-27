@@ -344,6 +344,28 @@ size_t safind(struct sorted_array* array, void* elem)
 }
 
 /**
+ * @errors
+ * @b EINVAL -- @p array or @p elem is NULL
+ * @b ERANGE -- @p index is out of range.
+ */
+int sacmp(struct sorted_array* array, size_t index, void* elem)
+{
+	if (array == NULL || elem == NULL)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (index >= array->n)
+	{
+		errno = ERANGE;
+		return -1;
+	}
+
+	return cmp(array, index, elem);
+}
+
+/**
  * @errors 
  * @b EINVAL -- @p array is NULL.
  */
