@@ -29,13 +29,19 @@ Tests: Tests.o
 
 clean:
 	@printf "\033[32mRemoving all build files...\033[0m\n"
-	rm -rf *.o *.so Tests doc/*/
+	rm -rf *.o *.so Tests doc/*/ *.gcov *.gcno *.gcda
 
 doxygen:
 	@printf "\033[32mGenerating documentation...\033[0m\n"
 	doxygen doc/Doxyfile > /dev/null
 
+testcov: Tests.cpp sorted_array.cpp
+	g++ $(CFLAGS) -fprofile-arcs -ftest-coverage -o Tests Tests.cpp sorted_array.cpp
+	./Tests
+	gcov sorted_array.cpp
+
 ### Dependencies on headers ###
 
 libsarr.so: sorted_array.h
 Tests.o: SortedArray.hpp sorted_array.h
+testcov: SortedArray.hpp sorted_array.h

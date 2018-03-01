@@ -18,6 +18,8 @@ public:
 	inline SortedArray(size_t maxElems, int (*compar)(const void* a, const void* b))
 	{
 		array = sanew(sizeof(T), maxElems, compar);
+		if (errno != 0)
+			throw errno;
 	}
 
 	~SortedArray()
@@ -27,19 +29,66 @@ public:
 		sadelete(array);
 	}
 
-	inline void put(T elem)			{ saput(array, &elem); }
-	inline T get(size_t index)		{ return *(T*)saget(array, index); }
-	inline void remove(size_t index){ sarm(array, index); }
-	inline void removeAll(T elem)	{ sarmall(array, &elem); }
-	inline size_t len()				{ return salen(array); }
-	inline size_t find(T elem)		{ return safind(array, &elem); }
-	inline void resort()			{ saresort(array); }
+	inline void put(T elem)	
+	{ 
+		saput(array, &elem); 
+		if (errno != 0)
+			throw errno;
+	}
+	
+	inline T get(size_t index) 
+	{ 
+		T* t = (T*)saget(array, index); 
+		if (errno == 0)
+			return *t;
+		else 
+			throw errno;
+	}
+	
+	inline void remove(size_t index) 
+	{
+		sarm(array, index); 
+		if (errno != 0)
+			throw errno;
+	}
+	
+	inline void removeAll(T elem) 
+	{ 
+		sarmall(array, &elem); 
+		if (errno != 0)
+			throw errno;
+	}
 
-	void foreach(void (*func)(void* elem))
-	{ saforeach(array, func); }
+	inline size_t len()	
+	{ 
+		return salen(array); 
+	}
+	
+	inline size_t find(T elem) 
+	{ 
+		size_t i = safind(array, &elem); 
+		if (errno == 0)
+			return i;
+		else
+			throw errno;
+	}
+	
+	inline void resort() 
+	{ saresort(array); }
+
+	void foreach(void (*func)(void* elem)) 
+	{ 
+		saforeach(array, func); 
+		if (errno != 0)
+			throw errno;
+	}
 
 	void foreach(void* context, void (*func)(struct sorted_array* array, void* elem, void* context))
-	{ saforeach(array, context, func); }
+	{ 
+		saforeach(array, context, func); 
+		if (errno != 0)
+			throw errno;
+	}
 
 	/**
 	* Sorted Array Iterator
@@ -49,13 +98,22 @@ public:
 	{
 	public:
 		Iterator(SortedArray &sa)
-		{ it = sainew(sa.array); }
+		{ 
+			it = sainew(sa.array); 
+			if (errno != 0)
+				throw errno; 
+		}
 
 		~Iterator()
 		{ saidelete(it); }
 
-		inline T get()		{ return *(T*)saiget(it); }
-		inline void next()	{ sainext(it); }
+		inline T get() { return *(T*)saiget(it); }
+		inline void next()	
+		{ 
+			sainext(it); 
+			if (errno != 0)
+				throw errno; 
+		}
 		inline bool isEnd()	{ return saiend(it); }
 
 	private:

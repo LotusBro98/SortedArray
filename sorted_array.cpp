@@ -64,34 +64,6 @@ void shifLeft(struct sorted_array* array, size_t index, size_t shift)
 		*(p) = *(p + shift);
 }
 
-/// Find the first element that is greater than given or any element that is equal to given in a sorted array.
-size_t findPlace(struct sorted_array* array, void* elem)
-{
-	if (array->n == 0)
-		return 0;
-	if (cmp(array, 0, elem) >= 0)
-		return 0;
-	if (cmp(array, array->n - 1, elem) <= 0)
-		return array->n;
-
-
-	size_t left = 0;
-	size_t right = array->n - 1;
-	size_t center;
-	while (left + 1 < right)
-	{
-		center = (left + right) / 2;
-		int sign = cmp(array, center, elem);
-		if (sign == 0)
-			return center;
-		if (sign < 0)
-			left = center;
-		else
-			right = center;
-	}
-	return right;
-}
-
 /// Find the first element >= @p elem
 size_t findPlaceLeft(struct sorted_array* array, void* elem)
 {
@@ -125,7 +97,7 @@ size_t findPlaceRight(struct sorted_array* array, void* elem)
 		return 0;
 	if (cmp(array, 0, elem) > 0)
 		return 0;
-	if (cmp(array, array->n - 1, elem) < 0)
+	if (cmp(array, array->n - 1, elem) <= 0)
 		return array->n;
 
 
@@ -224,7 +196,7 @@ void* saget(struct sorted_array* array, size_t index)
 /**
  * @errors
  * @b EINVAL -- @p array is NULL;\n
- * @b ENOMEM -- Maximum number of stored elements is reached.
+ * @b ENOBUFS -- Maximum number of stored elements is reached.
  */
 int saput(struct sorted_array* array, void* elem)
 {
@@ -236,11 +208,11 @@ int saput(struct sorted_array* array, void* elem)
 	
 	if (array->n >= array->max_elems)
 	{
-		errno = ENOMEM;
+		errno = ENOBUFS;
 		return -1;
 	}
 
-	size_t place = findPlace(array, elem);
+	size_t place = findPlaceRight(array, elem);
 	shiftRight(array, place, array->elem_size);
 	memcpy(getElem(array, place), elem, array->elem_size);
 	array->n++;
@@ -475,12 +447,19 @@ int saiend(struct sa_iter* it)
 /**
  * @errors
  * @b EINVAL -- @p it is NULL
+ * @b ERANGE -- @p it reached the end and can't go further.
  */
 int sainext(struct sa_iter* it)
 {
 	if (it == NULL)
 	{
 		errno = EINVAL;
+		return -1;
+	}
+
+	if (it->i >= it->array->n)
+	{
+		errno = ERANGE;
 		return -1;
 	}
 
@@ -491,12 +470,19 @@ int sainext(struct sa_iter* it)
 /**
  * @errors
  * @b EINVAL -- @p it is NULL
+ * @b ERANGE -- @p it reached the end and can't go further.
  */
 void* saiget(struct sa_iter* it)
 {
 	if (it == NULL)
 	{
 		errno = EINVAL;
+		return NULL;
+	}
+
+	if (it->i >= it->array->n)
+	{
+		errno = ERANGE;
 		return NULL;
 	}
 
