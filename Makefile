@@ -38,6 +38,7 @@ doxygen:
 testcov: Tests.cpp sorted_array.cpp
 	g++ $(CFLAGS) -fprofile-arcs -ftest-coverage -o Tests Tests.cpp sorted_array.cpp
 	./Tests
+	gcov Tests.cpp
 	gcov sorted_array.cpp
 
 ### Dependencies on headers ###

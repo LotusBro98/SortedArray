@@ -55,13 +55,20 @@ public:
 	inline void removeAll(T elem) 
 	{ 
 		sarmall(array, &elem); 
-		if (errno != 0)
-			throw errno;
 	}
 
 	inline size_t len()	
 	{ 
 		return salen(array); 
+	}
+
+	inline int cmp(size_t index, T elem)
+	{
+		int res = sacmp(array, index, &elem);
+		if (errno == 0)
+			return res;
+		else
+			throw errno;
 	}
 	
 	inline size_t find(T elem) 
@@ -83,7 +90,7 @@ public:
 			throw errno;
 	}
 
-	void foreach(void* context, void (*func)(struct sorted_array* array, void* elem, void* context))
+	void foreach(void* context, void (*func)(void* elem, void* context))
 	{ 
 		saforeach(array, context, func); 
 		if (errno != 0)
@@ -107,7 +114,15 @@ public:
 		~Iterator()
 		{ saidelete(it); }
 
-		inline T get() { return *(T*)saiget(it); }
+		inline T get() 
+		{
+			T* t = (T*)saiget(it); 
+			if (errno == 0)
+				return *t;
+			else
+				throw errno;
+		}
+		
 		inline void next()	
 		{ 
 			sainext(it); 
@@ -140,11 +155,18 @@ public:
 			return false;
 
 		for (size_t i = 0; i < N; i++)
-			if (sacmp(this->array, i, &(array[i])) != 0)
+			if (cmp(i, array[i]) != 0)
 				return false;
 
 		return true;
 	}
+
+	template <size_t N>
+	inline bool operator!=(T (&array)[N])
+	{ 
+		return !operator==(array); 
+	}
+	
 
 private:
 	struct sorted_array* array;

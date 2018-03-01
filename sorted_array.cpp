@@ -125,11 +125,11 @@ size_t findPlaceRight(struct sorted_array* array, void* elem)
 /**
  * @errors
  * @b ENOMEM -- Failed to allocate memory;\n
- * @b ERANGE -- @p elem_size of @p max_elems is not positive.
+ * @b ERANGE -- @p elem_size is not positive or @p max_elems is negative.
  */
 struct sorted_array* sanew(ssize_t elem_size, ssize_t max_elems, int (*compar)(const void* a, const void* b))
 {
-	if (elem_size <= 0 || max_elems <= 0)
+	if (elem_size <= 0 || max_elems < 0)
 	{
 		errno = ERANGE;
 		return NULL;
@@ -369,7 +369,7 @@ int saforeach(struct sorted_array* array, void (*func)(void* elem))
 }
 
 /// @errors @b EINVAL -- @p array, @p func or @p context is NULL;
-int saforeach(struct sorted_array* array, void* context, void (*func)(struct sorted_array* array, void* elem, void* context))
+int saforeach(struct sorted_array* array, void* context, void (*func)(void* elem, void* context))
 {
 	if (array == NULL || func == NULL || context == NULL)
 	{
@@ -378,7 +378,7 @@ int saforeach(struct sorted_array* array, void* context, void (*func)(struct sor
 	}
 
 	for (size_t i = 0; i < array->n; i++)
-		func(array, getElem(array, i), context);
+		func(getElem(array, i), context);
 
 	return 0;
 }

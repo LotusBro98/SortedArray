@@ -22,7 +22,7 @@
  *   + saiend();
  *   + sainext();
  *   + saiget();
- * - different variants of foreach() function.
+ * - different variants of saforeach() function.
  * - saresort() function to fix broken order in case when it can change.
  */
 
@@ -144,7 +144,7 @@ int saforeach(struct sorted_array* array, void (*func)(void* elem));
  *
  * The extended version. You can also pass an argument @p context to every call of @p func.
  */
-int saforeach(struct sorted_array* array, void* context, void (*func)(struct sorted_array* array, void* elem, void* context));
+int saforeach(struct sorted_array* array, void* context, void (*func)(void* elem, void* context));
 
 // ----------------------------------  ITERATOR -------------------------------
 
